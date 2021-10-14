@@ -23,7 +23,7 @@ def _randomize():
 
 
 st.header("Welcome to the Image WorkDesk!")
-st.caption("A mini-app image-processing by Siddhant Sadangi")
+st.caption("A mini image processing Streamlit app by Siddhant Sadangi")
 
 uploaded_file = st.file_uploader(
     label="Upload an image", type=["bmp", "jpg", "jpeg", "png", "svg"]
