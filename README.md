@@ -1,0 +1,7 @@
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)]()
+
+# Image WorkDesk Streamlit App
+
+Thanks for checking out this mini-project! 💖 <br>
+I am working on additional features, and would love to hear your feedback and if you had some features which you would like to be added. <br>
+You can reach out to me at [siddhant.sadangi@gmail.com](mailto:siddhant.sadangi@gmail.com) and/or connect with me on [LinkedIn](https://linkedin.com/in/siddhantsadangi).
