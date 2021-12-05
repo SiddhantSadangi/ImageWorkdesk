@@ -23,7 +23,15 @@ def _randomize():
 
 
 st.header("Welcome to the Image WorkDesk!")
-st.caption("A mini image processing Streamlit app by Siddhant Sadangi")
+st.markdown(
+    "A mini image processing Streamlit app by [Siddhant Sadangi](https://linkedin.com/in/siddhantsadangi)."
+)
+st.caption(
+    "This app lets you play around with image properties like brightness, saturation, contrast, and sharpness. "
+    "You can also randomize these properties at the click of a button!"
+)
+st.caption("More functionality coming soon... Stay tuned :)")
+
 
 uploaded_file = st.file_uploader(
     label="Upload an image", type=["bmp", "jpg", "jpeg", "png", "svg"]
