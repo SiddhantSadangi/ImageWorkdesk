@@ -140,25 +140,24 @@ if uploaded_file is not None:
     ):
         right_col.success(f"Sharpness reset to original!")
 
-    st.image(sharpness_img, use_column_width="auto", caption="Final Image")
+    left_col.image(img_arr, use_column_width="auto", caption="Original Image")
+    right_col.image(sharpness_img, use_column_width="auto", caption="Final Image")
+
+    Image.fromarray(sharpness_img).save("final_image.png")
 
     col1, col2, col3 = st.columns(3)
     if col1.button("Reset All", on_click=_reset_slider, kwargs={"key": "all"}):
         st.success(f"Image reset to original!")
     if col2.button("Surprise Me!", on_click=_randomize):
         st.success(f"Random image generated")
-    col3.markdown(
-        "Right click on the image and click on `Save Image As` to download image"
-    )
+    with open("final_image.png", "rb") as file:
+        col3.download_button("Download Final Image", data=file, mime="image/png")
 
     st.markdown(
         "Thanks for checking out this mini-project! :sparkling_heart:  \n"
         "I am working on additional features, and would love to hear your feedback and if you had some features which you would like to be added.  \n"
         "You can reach out to me at [siddhant.sadangi@gmail.com](mailto:siddhant.sadangi@gmail.com) and/or connect with me on [LinkedIn](https://linkedin.com/in/siddhantsadangi).",
         unsafe_allow_html=False,
-    )
-    st.caption(
-        "If you can help me figure out how to download an image using streamlit.download_button(), please do reach out :)"
     )
 
 # TODO: Flip and rotate, Remove background

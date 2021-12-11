@@ -1,3 +1,4 @@
 *.idea
 *.ipynb
 *.yaml
+/final_image.png
