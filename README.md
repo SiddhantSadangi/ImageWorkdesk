@@ -1,5 +1,3 @@
-[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://share.streamlit.io/siddhantsadangi/imageworkdesk/ImageProcessing.py)
-
 # Image WorkDesk Streamlit App
 
 This app lets you play around with image properties like brightness, saturation, contrast, and sharpness. You can also crop the image or randomize these properties at the click of a button!
