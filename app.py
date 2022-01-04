@@ -4,6 +4,8 @@ import streamlit as st
 from PIL import Image, ImageEnhance
 from streamlit_cropper import st_cropper
 
+VERSION = "0.3.1"
+
 
 # ---------- FUNCTIONS ----------
 def _reset(key):
@@ -31,8 +33,8 @@ st.markdown(
     "A mini image processing Streamlit app by [Siddhant Sadangi](https://linkedin.com/in/siddhantsadangi)."
 )
 st.caption(
-    "This app lets you play around with image properties like brightness, saturation, contrast, and sharpness. "
-    "You can also crop the image or randomize these properties at the click of a button!"
+    "This app lets you crop images and play around with image properties like brightness, saturation, contrast, and sharpness. "
+    "You can also randomize these properties and download the final image at the click of a button!"
 )
 st.caption("More functionality coming soon... Stay tuned :)")
 
@@ -210,13 +212,30 @@ if uploaded_file is not None:
     with open("final_image.png", "rb") as file:
         col3.download_button("Download Final Image", data=file, mime="image/png")
 
-    # ---------- FOOTER ----------
-    st.markdown(
-        "Thanks for checking out this mini-project! :sparkling_heart:  \n"
-        "I am working on additional features, and would love to hear your feedback and if you had some features which "
-        "you would like to be added.  \n "
-        "You can reach out to me at [siddhant.sadangi@gmail.com](mailto:siddhant.sadangi@gmail.com) and/or connect "
-        "with me on [LinkedIn](https://linkedin.com/in/siddhantsadangi).",
+# ---------- FOOTER ----------
+st.caption(
+    "---\n"
+    "Thanks for checking out this mini-project! :sparkling_heart:  \n"
+    "I am working on additional features, and would love to hear your feedback and if you had some features which "
+    "you would like to be added.  \n "
+    "You can reach out to me at [siddhant.sadangi@gmail.com](mailto:siddhant.sadangi@gmail.com) and/or connect "
+    "with me on [LinkedIn](https://linkedin.com/in/siddhantsadangi).",
+)
+
+col1, col2, col3 = st.columns(3)
+
+with col2:
+    st.components.v1.html(
+        '<script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" '
+        'data-name="bmc-button" data-slug="siddhantsadangi" data-color="#000000" data-emoji=""  '
+        'data-font="Cookie" data-text="Buy me a coffee" data-outline-color="#ffffff" '
+        'data-font-color="#ffffff" data-coffee-color="#FFDD00" ></script>',
+        height=60,
     )
+
+st.components.v1.html(
+    f'<div style="text-align:right; font-size:14px; color:grey"> v{VERSION} </div>',
+    height=20,
+)
 
 # TODO: Flip and rotate, Remove background
