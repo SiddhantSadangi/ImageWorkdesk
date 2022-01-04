@@ -4,7 +4,7 @@ import streamlit as st
 from PIL import Image, ImageEnhance
 from streamlit_cropper import st_cropper
 
-VERSION = "0.3.1"
+VERSION = "0.3.2"
 
 
 # ---------- FUNCTIONS ----------
@@ -39,7 +39,9 @@ st.caption(
 st.caption("More functionality coming soon... Stay tuned :)")
 
 uploaded_file = st.file_uploader(
-    label="Upload an image", type=["bmp", "jpg", "jpeg", "png", "svg"]
+    label="Upload an image",
+    type=["bmp", "jpg", "jpeg", "png", "svg"],
+    help="Uploaded images are deleted from the server when you\n* upload another image\n* clear the file uploader\n* close the browser tab",
 )
 
 if uploaded_file is not None:
@@ -235,7 +237,7 @@ with col2:
 
 st.components.v1.html(
     f'<div style="text-align:right; font-size:14px; color:grey"> v{VERSION} </div>',
-    height=20,
+    height=30,
 )
 
 # TODO: Flip and rotate, Remove background
