@@ -4,7 +4,9 @@ import streamlit as st
 from PIL import Image, ImageEnhance
 from streamlit_cropper import st_cropper
 
-VERSION = "0.3.2"
+VERSION = "0.3.3"
+
+st.set_page_config(page_title="Image WorkDesk", page_icon="🖼️")
 
 
 # ---------- FUNCTIONS ----------
@@ -28,7 +30,7 @@ def _randomize():
 
 
 # ---------- HEADER ----------
-st.title("Welcome to the Image WorkDesk!")
+st.title("Welcome to Image WorkDesk!")
 st.markdown(
     "A mini image processing Streamlit app by [Siddhant Sadangi](https://linkedin.com/in/siddhantsadangi)."
 )
@@ -240,4 +242,4 @@ st.components.v1.html(
     height=30,
 )
 
-# TODO: Flip and rotate, Remove background
+# TODO: Flip and rotate, Remove background, markup
