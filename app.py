@@ -4,7 +4,7 @@ import streamlit as st
 from PIL import Image, ImageEnhance
 from streamlit_cropper import st_cropper
 
-VERSION = "0.4.0"
+VERSION = "0.4.1"
 
 st.set_page_config(
     page_title="Image WorkDesk",
@@ -244,7 +244,7 @@ st.components.v1.html(
     'data-font="Cookie" data-text="Buy me a coffee if you like my work" data-outline-color="#ffffff" '
     'data-font-color="#ffffff" data-coffee-color="#FFDD00" ></script>'
     "<br>"
-    '<a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><upload_img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /></a>'
+    '<a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /></a>'
     "<br>"
     'This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.'
     "</div>",
