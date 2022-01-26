@@ -4,9 +4,16 @@ import streamlit as st
 from PIL import Image, ImageEnhance
 from streamlit_cropper import st_cropper
 
-VERSION = "0.3.3"
+VERSION = "0.4.0"
 
-st.set_page_config(page_title="Image WorkDesk", page_icon="🖼️")
+st.set_page_config(
+    page_title="Image WorkDesk",
+    page_icon="🖼️",
+    menu_items={
+        "About": f"Image WorkDesk v{VERSION}  "
+        f"\nApp contact: [Siddhant Sadangi](mailto:siddhant.sadangi@gmail.com)"
+    },
+)
 
 
 # ---------- FUNCTIONS ----------
@@ -32,7 +39,7 @@ def _randomize():
 # ---------- HEADER ----------
 st.title("Welcome to Image WorkDesk!")
 st.markdown(
-    "A mini image processing Streamlit app by [Siddhant Sadangi](https://linkedin.com/in/siddhantsadangi)."
+    "An image processing app by [Siddhant Sadangi](https://linkedin.com/in/siddhantsadangi)."
 )
 st.caption(
     "This app lets you crop images and play around with image properties like brightness, saturation, contrast, and sharpness. "
@@ -40,48 +47,54 @@ st.caption(
 )
 st.caption("More functionality coming soon... Stay tuned :)")
 
-uploaded_file = st.file_uploader(
-    label="Upload an image",
-    type=["bmp", "jpg", "jpeg", "png", "svg"],
+option = st.radio(
+    label="Upload an image, or take one with your camera",
+    options=("Upload an image", "Take a photo with my camera"),
     help="Uploaded images are deleted from the server when you\n* upload another image\n* clear the file uploader\n* close the browser tab",
 )
 
-if uploaded_file is not None:
-    name = uploaded_file.name.rsplit(".", 1)[0]
-    ext = uploaded_file.name.split(".")[-1]
-    img_arr = np.asarray(Image.open(uploaded_file))
+if option == "Take a photo with my camera":
+    upload_img = st.camera_input(
+        label="Take a picture",
+    )
+else:
+    upload_img = st.file_uploader(
+        label="Upload an image",
+        type=["bmp", "jpg", "jpeg", "png", "svg"],
+    )
+
+if upload_img is not None:
+    name = upload_img.name.rsplit(".", 1)[0]
+    ext = upload_img.name.split(".")[-1]
+    pil_img = Image.open(upload_img).convert("RGB")
+    img_arr = np.asarray(pil_img)
+
+    # ---------- PROPERTIES ----------
     st.image(img_arr, use_column_width="auto", caption="Uploaded Image")
+    orig_width, orig_height = pil_img.size
+    st.text(f"Original width = {orig_width}px and height = {orig_height}px")
 
     st.caption("All changes are applied on top of the previous change.")
 
     # ---------- CROP ----------
+    st.text("Crop image")
+    cropped_img_coords = st_cropper(Image.fromarray(img_arr), return_type="box")
 
-    with st.container():
-        left_col, right_col = st.columns(2)
+    # ---------- CREATE BOUNDING BOX ----------
+    left = cropped_img_coords["left"]
+    right = cropped_img_coords["left"] + cropped_img_coords["width"]
+    top = cropped_img_coords["top"]
+    bottom = cropped_img_coords["top"] + cropped_img_coords["height"]
+    bb = (
+        0 if left < 0 else left,
+        0 if top < 0 else top,
+        img_arr.shape[1] if right > img_arr.shape[1] else right,
+        img_arr.shape[0] if bottom > img_arr.shape[0] else bottom,
+    )
 
-        with left_col:
-            st.text("Crop image")
-            cropped_img_coords = st_cropper(Image.fromarray(img_arr), return_type="box")
-
-        # ---------- CREATE BOUNDING BOX ----------
-        left = cropped_img_coords["left"]
-        right = cropped_img_coords["left"] + cropped_img_coords["width"]
-        top = cropped_img_coords["top"]
-        bottom = cropped_img_coords["top"] + cropped_img_coords["height"]
-        bb = (
-            0 if left < 0 else left,
-            0 if top < 0 else top,
-            img_arr.shape[1] if right > img_arr.shape[1] else right,
-            img_arr.shape[0] if bottom > img_arr.shape[0] else bottom,
-        )
-
-        with right_col:
-            cropped_img = Image.fromarray(img_arr).crop(bb)
-            st.text("Preview")
-            st.image(
-                cropped_img,
-                use_column_width="auto",
-            )
+    cropped_img = Image.fromarray(img_arr).crop(bb)
+    crp_width, crp_height = cropped_img.size
+    st.text(f"Cropped width = {crp_width}px and height = {crp_height}px")
 
     crop = st.checkbox(
         label="Use cropped Image?",
@@ -217,29 +230,23 @@ if uploaded_file is not None:
         col3.download_button("Download Final Image", data=file, mime="image/png")
 
 # ---------- FOOTER ----------
-st.caption(
-    "---\n"
-    "Thanks for checking out this mini-project! :sparkling_heart:  \n"
-    "I am working on additional features, and would love to hear your feedback and if you had some features which "
-    "you would like to be added.  \n "
-    "You can reach out to me at [siddhant.sadangi@gmail.com](mailto:siddhant.sadangi@gmail.com) and/or connect "
-    "with me on [LinkedIn](https://linkedin.com/in/siddhantsadangi).",
-)
-
-col1, col2, col3 = st.columns(3)
-
-with col2:
-    st.components.v1.html(
-        '<script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" '
-        'data-name="bmc-button" data-slug="siddhantsadangi" data-color="#000000" data-emoji=""  '
-        'data-font="Cookie" data-text="Buy me a coffee" data-outline-color="#ffffff" '
-        'data-font-color="#ffffff" data-coffee-color="#FFDD00" ></script>',
-        height=60,
-    )
 
 st.components.v1.html(
-    f'<div style="text-align:right; font-size:14px; color:grey"> v{VERSION} </div>',
-    height=30,
+    '<head><link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro" rel="stylesheet" type="text/css"></head>'
+    "<div style=\"text-align:center; font-size:14px; color:grey; font-family: 'Source Sans Pro', sans-serif;\">"
+    "Thanks for trying this app!"
+    "<br>"
+    "I am working on additional features, and would love to hear your feedback and if you had some features which you would like to be added."
+    'You can reach out to me at <a href="mailto:siddhant.sadangi@gmail.com">siddhant.sadangi@gmail.com</a> and/or connect with me on <a href="https://linkedin.com/in/siddhantsadangi">LinkedIn</a>.'
+    "<br><br>"
+    '<script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" '
+    'data-name="bmc-button" data-slug="siddhantsadangi" data-color="#000000" data-emoji=""  '
+    'data-font="Cookie" data-text="Buy me a coffee if you like my work" data-outline-color="#ffffff" '
+    'data-font-color="#ffffff" data-coffee-color="#FFDD00" ></script>'
+    "<br>"
+    '<a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><upload_img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /></a>'
+    "<br>"
+    'This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.'
+    "</div>",
+    height=225,
 )
-
-# TODO: Flip and rotate, Remove background, markup
