@@ -4,15 +4,53 @@ import streamlit as st
 from PIL import Image, ImageEnhance
 from streamlit_cropper import st_cropper
 
-VERSION = "0.4.1"
+VERSION = "0.4.2"
 
 st.set_page_config(
     page_title="Image WorkDesk",
     page_icon="🖼️",
     menu_items={
         "About": f"Image WorkDesk v{VERSION}  "
-        f"\nApp contact: [Siddhant Sadangi](mailto:siddhant.sadangi@gmail.com)"
+        f"\nApp contact: [Siddhant Sadangi](mailto:siddhant.sadangi@gmail.com)",
+        "Report a Bug": "https://github.com/SiddhantSadangi/ImageWorkdesk/issues/new",
+        "Get help": None,
     },
+)
+
+# ---------- SIDEBAR ----------
+with st.sidebar:
+    st.components.v1.html(
+        '<head><link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro" rel="stylesheet" type="text/css"></head>'
+        "<div style=\"text-align:center; font-size:14px; color:grey; font-family: 'Source Sans Pro', sans-serif;\">"
+        f"v{VERSION}"
+        "<br>"
+        '<iframe src="https://ghbtns.com/github-btn.html?user=SiddhantSadangi&repo=ImageWorkdesk&type=star" frameborder="0" width="50" height="17" title="GitHub"></iframe>'
+        " to be notified of updates"
+        "<br>"
+        "<br><hr><br>"
+        "Made with ❤️ by <b>Siddhant Sadangi</b> "
+        '<a href="https://linkedin.com/in/siddhantsadangi"><script src="https://code.iconify.design/2/2.1.2/iconify.min.js"></script><span class="iconify-inline" data-icon="ion:logo-linkedin"></span></a>&nbsp'
+        '<a href="mailto:siddhantsadangi@gmail.com"><span class="iconify-inline" data-icon="carbon:email"></span></a>'
+        "<br><br>"
+        '<script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" '
+        'data-name="bmc-button" data-slug="siddhantsadangi" data-color="#000000" data-emoji=""  '
+        'data-font="Cookie" data-text="Buy me a coffee" data-outline-color="#ffffff" '
+        'data-font-color="#ffffff" data-coffee-color="#FFDD00" ></script>'
+        "<br><hr><br>"
+        '<a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /></a>'
+        "<br>"
+        '<div style="font-size:12px;">'
+        'This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.'
+        "<br>"
+        "You can modify and build upon this work non-commercially. All derivatives should be credited to me and be licenced under the same terms.",
+        height=370,
+    )
+
+# ---------- HEADER ----------
+st.title("Welcome to Image WorkDesk!")
+st.caption(
+    "This app lets you crop images and play around with image properties like brightness, saturation, contrast, and sharpness. "
+    "You can also randomize these properties and download the final image at the click of a button!"
 )
 
 
@@ -36,17 +74,7 @@ def _randomize():
     st.session_state["sharpness_slider"] = np.random.randint(0, 200)
 
 
-# ---------- HEADER ----------
-st.title("Welcome to Image WorkDesk!")
-st.markdown(
-    "An image processing app by [Siddhant Sadangi](https://linkedin.com/in/siddhantsadangi)."
-)
-st.caption(
-    "This app lets you crop images and play around with image properties like brightness, saturation, contrast, and sharpness. "
-    "You can also randomize these properties and download the final image at the click of a button!"
-)
-st.caption("More functionality coming soon... Stay tuned :)")
-
+# ---------- OPERATIONS ----------
 option = st.radio(
     label="Upload an image, or take one with your camera",
     options=("Upload an image", "Take a photo with my camera"),
@@ -228,25 +256,3 @@ if upload_img is not None:
         st.success(f"Random image generated")
     with open("final_image.png", "rb") as file:
         col3.download_button("Download Final Image", data=file, mime="image/png")
-
-# ---------- FOOTER ----------
-
-st.components.v1.html(
-    '<head><link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro" rel="stylesheet" type="text/css"></head>'
-    "<div style=\"text-align:center; font-size:14px; color:grey; font-family: 'Source Sans Pro', sans-serif;\">"
-    "Thanks for trying this app!"
-    "<br>"
-    "I am working on additional features, and would love to hear your feedback and if you had some features which you would like to be added."
-    'You can reach out to me at <a href="mailto:siddhant.sadangi@gmail.com">siddhant.sadangi@gmail.com</a> and/or connect with me on <a href="https://linkedin.com/in/siddhantsadangi">LinkedIn</a>.'
-    "<br><br>"
-    '<script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" '
-    'data-name="bmc-button" data-slug="siddhantsadangi" data-color="#000000" data-emoji=""  '
-    'data-font="Cookie" data-text="Buy me a coffee if you like my work" data-outline-color="#ffffff" '
-    'data-font-color="#ffffff" data-coffee-color="#FFDD00" ></script>'
-    "<br>"
-    '<a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /></a>'
-    "<br>"
-    'This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.'
-    "</div>",
-    height=225,
-)
