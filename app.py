@@ -1,10 +1,10 @@
 import numpy as np
 import streamlit as st
 
-from PIL import Image, ImageEnhance
+from PIL import Image, ImageEnhance, ImageOps
 from streamlit_cropper import st_cropper
 
-VERSION = "0.4.2"
+VERSION = "0.4.3"
 
 st.set_page_config(
     page_title="Image WorkDesk",
@@ -18,33 +18,11 @@ st.set_page_config(
 )
 
 # ---------- SIDEBAR ----------
+with open("sidebar.html", "r", encoding="UTF-8") as sidebar_file:
+    sidebar_html = sidebar_file.read().replace("{VERSION}", VERSION)
+
 with st.sidebar:
-    st.components.v1.html(
-        '<head><link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro" rel="stylesheet" type="text/css"></head>'
-        "<div style=\"text-align:center; font-size:14px; color:grey; font-family: 'Source Sans Pro', sans-serif;\">"
-        f"v{VERSION}"
-        "<br>"
-        '<iframe src="https://ghbtns.com/github-btn.html?user=SiddhantSadangi&repo=ImageWorkdesk&type=star" frameborder="0" width="50" height="17" title="GitHub"></iframe>'
-        " to be notified of updates"
-        "<br>"
-        "<br><hr><br>"
-        "Made with ❤️ by <b>Siddhant Sadangi</b> "
-        '<a href="https://linkedin.com/in/siddhantsadangi"><script src="https://code.iconify.design/2/2.1.2/iconify.min.js"></script><span class="iconify-inline" data-icon="ion:logo-linkedin"></span></a>&nbsp'
-        '<a href="mailto:siddhantsadangi@gmail.com"><span class="iconify-inline" data-icon="carbon:email"></span></a>'
-        "<br><br>"
-        '<script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" '
-        'data-name="bmc-button" data-slug="siddhantsadangi" data-color="#000000" data-emoji=""  '
-        'data-font="Cookie" data-text="Buy me a coffee" data-outline-color="#ffffff" '
-        'data-font-color="#ffffff" data-coffee-color="#FFDD00" ></script>'
-        "<br><hr><br>"
-        '<a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /></a>'
-        "<br>"
-        '<div style="font-size:12px;">'
-        'This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.'
-        "<br>"
-        "You can modify and build upon this work non-commercially. All derivatives should be credited to me and be licenced under the same terms.",
-        height=370,
-    )
+    st.components.v1.html(sidebar_html, height=390)
 
 # ---------- HEADER ----------
 st.title("Welcome to Image WorkDesk!")
@@ -56,18 +34,21 @@ st.caption(
 
 # ---------- FUNCTIONS ----------
 def _reset(key):
-    if key != "all":
-        st.session_state[key] = 100
-    else:
+    if key == "all":
+        st.session_state["rotate_slider"] = 0
         st.session_state["brightness_slider"] = st.session_state[
             "saturation_slider"
-        ] = st.session_state["contrast_slider"] = st.session_state[
-            "sharpness_slider"
-        ] = 100
-        st.session_state["crop"] = False
+        ] = st.session_state["contrast_slider"] = 100
+        st.session_state["crop"] = st.session_state["mirror"] = 0
+    elif key == "rotate_slider":
+        st.session_state["rotate_slider"] = 0
+    else:
+        st.session_state[key] = 100
 
 
 def _randomize():
+    st.session_state["mirror"] = np.random.choice([0, 1])
+    st.session_state["rotate_slider"] = np.random.randint(0, 360)
     st.session_state["brightness_slider"] = np.random.randint(0, 200)
     st.session_state["saturation_slider"] = np.random.randint(0, 200)
     st.session_state["contrast_slider"] = np.random.randint(0, 200)
@@ -124,21 +105,56 @@ if upload_img is not None:
     crp_width, crp_height = cropped_img.size
     st.text(f"Cropped width = {crp_width}px and height = {crp_height}px")
 
-    crop = st.checkbox(
-        label="Use cropped Image?",
-        help="Select to use the cropped image in further operations",
-        key="crop",
-    )
-    image = cropped_img if crop else Image.fromarray(img_arr)
-
-    # ---------- OTHER OPERATIONS ----------
     with st.container():
         left_col, right_col = st.columns(2)
+        crop = left_col.checkbox(
+            label="Use cropped Image?",
+            help="Select to use the cropped image in further operations",
+            key="crop",
+        )
+        image = cropped_img if crop else Image.fromarray(img_arr)
+
+        # ---------- MIRROR ----------
+        mirror = right_col.checkbox(
+            label="Mirror image?",
+            help="Select to mirror the image",
+            key="mirror",
+        )
+
+        image = ImageOps.mirror(image) if mirror else image
+
+    # ---------- OTHER OPERATIONS ----------
+    # ---------- 1ST ROW ----------
+    with st.container():
+        left_col, right_col = st.columns(2)
+
+        # ---------- ROTATE ----------
+        if "rotate_slider" not in st.session_state:
+            st.session_state["rotate_slider"] = 0
+        degrees = left_col.slider(
+            "Drag slider to rotate image clockwise",
+            min_value=0,
+            max_value=360,
+            value=st.session_state["rotate_slider"],
+            key="rotate_slider",
+        )
+        rotated_img = image.rotate(360 - degrees)
+        left_col.image(
+            rotated_img,
+            use_column_width="auto",
+            caption=f"Rotated by {degrees} degrees clockwise",
+        )
+        if left_col.button(
+            "Reset Rotation",
+            on_click=_reset,
+            kwargs={"key": "rotate_slider"},
+        ):
+            left_col.success(f"Rotation reset to original!")
 
         # ---------- BRIGHTNESS ----------
         if "brightness_slider" not in st.session_state:
             st.session_state["brightness_slider"] = 100
-        brightness_factor = left_col.slider(
+        brightness_factor = right_col.slider(
             "Drag slider to change brightness",
             min_value=0,
             max_value=200,
@@ -146,24 +162,27 @@ if upload_img is not None:
             key="brightness_slider",
         )
         brightness_img = np.asarray(
-            ImageEnhance.Brightness(image).enhance(brightness_factor / 100)
+            ImageEnhance.Brightness(rotated_img).enhance(brightness_factor / 100)
         )
-        left_col.image(
+        right_col.image(
             brightness_img,
             use_column_width="auto",
             caption=f"Brightness: {brightness_factor}%",
         )
-        if left_col.button(
+        if right_col.button(
             "Reset Brightness",
             on_click=_reset,
             kwargs={"key": "brightness_slider"},
         ):
-            left_col.success(f"Brightness reset to original!")
+            right_col.success(f"Brightness reset to original!")
 
+    # ---------- 2ND ROW ----------
+    with st.container():
+        left_col, right_col = st.columns(2)
         # ---------- SATURATION ----------
         if "saturation_slider" not in st.session_state:
             st.session_state["saturation_slider"] = 100
-        saturation_factor = right_col.slider(
+        saturation_factor = left_col.slider(
             "Drag slider to change saturation",
             min_value=0,
             max_value=200,
@@ -175,24 +194,22 @@ if upload_img is not None:
                 saturation_factor / 100
             )
         )
-        right_col.image(
+        left_col.image(
             saturation_img,
             use_column_width="auto",
             caption=f"Saturation: {saturation_factor}%",
         )
-        if right_col.button(
+        if left_col.button(
             "Reset Saturation",
             on_click=_reset,
             kwargs={"key": "saturation_slider"},
         ):
-            right_col.success(f"Saturation reset to original!")
+            left_col.success(f"Saturation reset to original!")
 
-    with st.container():
-        left_col, right_col = st.columns(2)
         # ---------- CONTRAST ----------
         if "contrast_slider" not in st.session_state:
             st.session_state["contrast_slider"] = 100
-        contrast_factor = left_col.slider(
+        contrast_factor = right_col.slider(
             "Drag slider to change contrast",
             min_value=0,
             max_value=200,
@@ -204,42 +221,45 @@ if upload_img is not None:
                 contrast_factor / 100
             )
         )
-        left_col.image(
+        right_col.image(
             contrast_img,
             use_column_width="auto",
             caption=f"Contrast: {contrast_factor}%",
         )
-        if left_col.button(
+        if right_col.button(
             "Reset Contrast", on_click=_reset, kwargs={"key": "contrast_slider"}
         ):
-            left_col.success(f"Contrast reset to original!")
+            right_col.success(f"Contrast reset to original!")
 
-        # ---------- SHARPNESS ----------
-        if "sharpness_slider" not in st.session_state:
-            st.session_state["sharpness_slider"] = 100
-        sharpness_factor = right_col.slider(
-            "Drag slider to change sharpness",
-            min_value=0,
-            max_value=200,
-            value=st.session_state["sharpness_slider"],
-            key="sharpness_slider",
-        )
-        sharpness_img = np.asarray(
-            ImageEnhance.Sharpness(Image.fromarray(contrast_img)).enhance(
-                sharpness_factor / 100
+        # ---------- 3RD ROW ----------
+        with st.container():
+            left_col, right_col = st.columns(2)
+            # ---------- SHARPNESS ----------
+            if "sharpness_slider" not in st.session_state:
+                st.session_state["sharpness_slider"] = 100
+            sharpness_factor = left_col.slider(
+                "Drag slider to change sharpness",
+                min_value=0,
+                max_value=200,
+                value=st.session_state["sharpness_slider"],
+                key="sharpness_slider",
             )
-        )
-        right_col.image(
-            sharpness_img,
-            use_column_width="auto",
-            caption=f"Sharpness: {sharpness_factor}%",
-        )
-        if right_col.button(
-            "Reset Sharpness",
-            on_click=_reset,
-            kwargs={"key": "sharpness_slider"},
-        ):
-            right_col.success(f"Sharpness reset to original!")
+            sharpness_img = np.asarray(
+                ImageEnhance.Sharpness(Image.fromarray(contrast_img)).enhance(
+                    sharpness_factor / 100
+                )
+            )
+            left_col.image(
+                sharpness_img,
+                use_column_width="auto",
+                caption=f"Sharpness: {sharpness_factor}%",
+            )
+            if left_col.button(
+                "Reset Sharpness",
+                on_click=_reset,
+                kwargs={"key": "sharpness_slider"},
+            ):
+                left_col.success(f"Sharpness reset to original!")
 
     # ---------- FINAL OPERATIONS ----------
     st.subheader("View Results")
