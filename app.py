@@ -4,7 +4,7 @@ import streamlit as st
 from PIL import Image, ImageEnhance, ImageOps
 from streamlit_cropper import st_cropper
 
-VERSION = "0.4.3"
+VERSION = "0.4.4"
 
 st.set_page_config(
     page_title="Image WorkDesk",
@@ -22,7 +22,7 @@ with open("sidebar.html", "r", encoding="UTF-8") as sidebar_file:
     sidebar_html = sidebar_file.read().replace("{VERSION}", VERSION)
 
 with st.sidebar:
-    st.components.v1.html(sidebar_html, height=390)
+    st.components.v1.html(sidebar_html, height=400)
 
 # ---------- HEADER ----------
 st.title("Welcome to Image WorkDesk!")
