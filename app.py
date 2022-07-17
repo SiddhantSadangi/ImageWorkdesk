@@ -3,7 +3,7 @@ import streamlit as st
 from PIL import Image, ImageEnhance, ImageOps
 from streamlit_cropper import st_cropper
 
-VERSION = "0.4.5"
+VERSION = "0.5.0"
 
 st.set_page_config(
     page_title="Image WorkDesk",
@@ -120,6 +120,7 @@ if upload_img is not None:
             image = cropped_img
         else:
             image = Image.fromarray(img_arr)
+
         # ---------- MIRROR ----------
         if lcol.checkbox(
             label="Mirror image?",
@@ -129,15 +130,18 @@ if upload_img is not None:
             image = ImageOps.mirror(image)
 
         # ---------- GRAYSCALE / B&W ----------
-
         flag = True
-        if lcol.checkbox("Convert to grayscale / black & white?", key="gray_bw"):
+
+        if lcol.checkbox(
+            "Convert to grayscale / black & white?",
+            key="gray_bw",
+            help="Select to convert image to grayscale or black and white",
+        ):
 
             if (
                 lcol.radio(
                     label="Grayscale or B&W",
                     options=("Grayscale", "Black & White"),
-                    help="Select to convert image to grayscale or black and white",
                 )
                 == "Grayscale"
             ):
@@ -165,35 +169,35 @@ if upload_img is not None:
 
     st.markdown("""---""")
 
-    if flag:
-        # ---------- OTHER OPERATIONS ----------
-        # ---------- 1ST ROW ----------
-        with st.container():
-            lcol, rcol = st.columns(2)
+    # ---------- OTHER OPERATIONS ----------
+    # ---------- 1ST ROW ----------
+    with st.container():
+        lcol, rcol = st.columns(2)
 
-            # ---------- ROTATE ----------
-            if "rotate_slider" not in st.session_state:
-                st.session_state["rotate_slider"] = 0
-            degrees = lcol.slider(
-                "Drag slider to rotate image clockwise",
-                min_value=0,
-                max_value=360,
-                value=st.session_state["rotate_slider"],
-                key="rotate_slider",
-            )
-            rotated_img = image.rotate(360 - degrees)
-            lcol.image(
-                rotated_img,
-                use_column_width="auto",
-                caption=f"Rotated by {degrees} degrees clockwise",
-            )
-            if lcol.button(
-                "Reset Rotation",
-                on_click=_reset,
-                kwargs={"key": "rotate_slider"},
-            ):
-                lcol.success("Rotation reset to original!")
+        # ---------- ROTATE ----------
+        if "rotate_slider" not in st.session_state:
+            st.session_state["rotate_slider"] = 0
+        degrees = lcol.slider(
+            "Drag slider to rotate image clockwise",
+            min_value=0,
+            max_value=360,
+            value=st.session_state["rotate_slider"],
+            key="rotate_slider",
+        )
+        rotated_img = image.rotate(360 - degrees)
+        lcol.image(
+            rotated_img,
+            use_column_width="auto",
+            caption=f"Rotated by {degrees} degrees clockwise",
+        )
+        if lcol.button(
+            "Reset Rotation",
+            on_click=_reset,
+            kwargs={"key": "rotate_slider"},
+        ):
+            lcol.success("Rotation reset to original!")
 
+        if flag:
             # ---------- BRIGHTNESS ----------
             if "brightness_slider" not in st.session_state:
                 st.session_state["brightness_slider"] = 100
