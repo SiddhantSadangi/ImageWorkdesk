@@ -3,7 +3,7 @@ import streamlit as st
 from PIL import Image, ImageEnhance, ImageOps
 from streamlit_cropper import st_cropper
 
-VERSION = "0.5.0"
+VERSION = "0.5.1"
 
 st.set_page_config(
     page_title="Image WorkDesk",
