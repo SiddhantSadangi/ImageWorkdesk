@@ -3,7 +3,7 @@ import streamlit as st
 from PIL import Image, ImageEnhance, ImageOps
 from streamlit_cropper import st_cropper
 
-VERSION = "0.5.1"
+VERSION = "0.5.2"
 
 st.set_page_config(
     page_title="Image WorkDesk",
@@ -32,7 +32,7 @@ st.caption(
 
 
 # ---------- FUNCTIONS ----------
-def _reset(key):
+def _reset(key: str) -> None:
     if key == "all":
         st.session_state["rotate_slider"] = 0
         st.session_state["brightness_slider"] = st.session_state[
@@ -51,7 +51,7 @@ def _reset(key):
         st.session_state[key] = 100
 
 
-def _randomize():
+def _randomize() -> None:
     st.session_state["mirror"] = np.random.choice([0, 1])
     st.session_state["rotate_slider"] = np.random.randint(0, 360)
     st.session_state["brightness_slider"] = np.random.randint(0, 200)
@@ -92,23 +92,7 @@ if upload_img is not None:
 
     # ---------- CROP ----------
     st.text("Crop image")
-    cropped_img_coords = st_cropper(Image.fromarray(img_arr), return_type="box")
-
-    # ---------- CREATE BOUNDING BOX ----------
-    left = cropped_img_coords["left"]
-    right = cropped_img_coords["left"] + cropped_img_coords["width"]
-    top = cropped_img_coords["top"]
-    bottom = cropped_img_coords["top"] + cropped_img_coords["height"]
-    bb = (
-        max(left, 0),
-        max(top, 0),
-        img_arr.shape[1] if right > img_arr.shape[1] else right,
-        img_arr.shape[0] if bottom > img_arr.shape[0] else bottom,
-    )
-
-    cropped_img = Image.fromarray(img_arr).crop(bb)
-    crp_width, crp_height = cropped_img.size
-    st.text(f"Cropped width = {crp_width}px and height = {crp_height}px")
+    cropped_img = st_cropper(Image.fromarray(img_arr))
 
     with st.container():
         lcol, rcol = st.columns(2)
