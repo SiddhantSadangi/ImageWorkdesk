@@ -21,15 +21,10 @@ with open("sidebar.html", "r", encoding="UTF-8") as sidebar_file:
     sidebar_html = sidebar_file.read().replace("{VERSION}", VERSION)
 
 with st.sidebar:
-    st.components.v1.html(sidebar_html, height=400)
+    st.components.v1.html(sidebar_html, height=750)
 
 # ---------- HEADER ----------
 st.title("Welcome to Image WorkDesk!")
-st.caption(
-    "This app lets you crop images and play around with image properties like brightness, saturation, contrast, and sharpness. "
-    "You can also randomize these properties and download the final image at the click of a button!"
-)
-
 
 # ---------- FUNCTIONS ----------
 def _reset(key: str) -> None:
