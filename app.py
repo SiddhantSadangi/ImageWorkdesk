@@ -3,7 +3,7 @@ import streamlit as st
 from PIL import Image, ImageEnhance, ImageOps
 from streamlit_cropper import st_cropper
 
-VERSION = "0.5.3"
+VERSION = "0.5.4"
 
 st.set_page_config(
     page_title="Image WorkDesk",
@@ -14,6 +14,7 @@ st.set_page_config(
         "Report a Bug": "https://github.com/SiddhantSadangi/ImageWorkdesk/issues/new",
         "Get help": None,
     },
+    layout="wide",
 )
 
 # ---------- SIDEBAR ----------
@@ -80,14 +81,16 @@ if upload_img is not None:
 
     # ---------- PROPERTIES ----------
     st.image(img_arr, use_column_width="auto", caption="Uploaded Image")
-    orig_width, orig_height = pil_img.size
-    st.text(f"Original width = {orig_width}px and height = {orig_height}px")
+    st.text(f"Original width = {pil_img.size[0]}px and height = {pil_img.size[1]}px")
 
     st.caption("All changes are applied on top of the previous change.")
 
     # ---------- CROP ----------
     st.text("Crop image")
-    cropped_img = st_cropper(Image.fromarray(img_arr))
+    cropped_img = st_cropper(Image.fromarray(img_arr), should_resize_image=False)
+    st.text(
+        f"Cropped width = {cropped_img.size[0]}px and height = {cropped_img.size[1]}px"
+    )
 
     with st.container():
         lcol, rcol = st.columns(2)
@@ -116,7 +119,7 @@ if upload_img is not None:
             key="gray_bw",
             help="Select to convert image to grayscale or black and white",
         ):
-
+            mode = "L"
             if (
                 lcol.radio(
                     label="Grayscale or B&W",
@@ -124,7 +127,7 @@ if upload_img is not None:
                 )
                 == "Grayscale"
             ):
-                image = image.convert("L")
+                image = image.convert(mode)
             else:
                 flag = False
                 lcol.warning(
@@ -132,8 +135,9 @@ if upload_img is not None:
                 )
                 thresh = np.array(image).mean()
                 fn = lambda x: 255 if x > thresh else 0
-                image = image.convert("L").point(fn, mode="1")
-
+                image = image.convert(mode).point(fn, mode="1")
+        else:
+            mode = "RGB"
         rcol.image(
             image,
             use_column_width="auto",
@@ -296,13 +300,23 @@ if upload_img is not None:
     # ---------- FINAL OPERATIONS ----------
     st.subheader("View Results")
     lcol, rcol = st.columns(2)
-    lcol.image(img_arr, use_column_width="auto", caption="Original Image")
+    lcol.image(
+        img_arr,
+        use_column_width="auto",
+        caption=f"Original Image ({pil_img.size[0]} x {pil_img.size[1]})",
+    )
+
     try:
-        rcol.image(sharpness_img, use_column_width="auto", caption="Final Image")
-        Image.fromarray(sharpness_img).save("final_image.png")
+        final_image = sharpness_img
     except NameError:
-        rcol.image(rotated_img, use_column_width="auto", caption="Final Image")
-        rotated_img.save("final_image.png")
+        final_image = rotated_img
+
+    rcol.image(
+        final_image,
+        use_column_width="auto",
+        caption=f"Final Image ({final_image.shape[1]} x {final_image.shape[0]})",
+    )
+    Image.fromarray(final_image).save("final_image.png")
 
     col1, col2, col3 = st.columns(3)
     if col1.button("Reset All", on_click=_reset, kwargs={"key": "all"}):
@@ -310,4 +324,4 @@ if upload_img is not None:
     if col2.button("Surprise Me!", on_click=_randomize):
         st.success("Random image generated")
     with open("final_image.png", "rb") as file:
-        col3.download_button("Download Final Image", data=file, mime="image/png")
+        col3.download_button("Download Result", data=file, mime="image/png")

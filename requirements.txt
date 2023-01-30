@@ -1,4 +1,4 @@
-numpy==1.22.3
-Pillow==9.2.0
-streamlit==1.16.0
-streamlit_cropper==0.2.1
+numpy
+Pillow
+streamlit
+streamlit_cropper
