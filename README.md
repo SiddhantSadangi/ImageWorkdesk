@@ -4,6 +4,7 @@ A lightweight image-processing Streamlit app that supports the following operati
 
 * Upload image or take one with your camera
 * Crop
+* Remove background
 * Mirror
 * Convert to grayscale or black and white
 * Rotate

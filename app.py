@@ -1,9 +1,10 @@
 import numpy as np
 import streamlit as st
 from PIL import Image, ImageEnhance, ImageOps
+from rembg import remove
 from streamlit_cropper import st_cropper
 
-VERSION = "0.5.4"
+VERSION = "0.6.0"
 
 st.set_page_config(
     page_title="Image WorkDesk",
@@ -14,7 +15,7 @@ st.set_page_config(
         "Report a Bug": "https://github.com/SiddhantSadangi/ImageWorkdesk/issues/new",
         "Get help": None,
     },
-    layout="wide",
+    layout="centered",
 )
 
 # ---------- SIDEBAR ----------
@@ -34,9 +35,9 @@ def _reset(key: str) -> None:
         st.session_state["brightness_slider"] = st.session_state[
             "saturation_slider"
         ] = st.session_state["contrast_slider"] = 100
-        st.session_state["crop"] = st.session_state["mirror"] = st.session_state[
-            "gray_bw"
-        ] = 0
+        st.session_state["bg"] = st.session_state["crop"] = st.session_state[
+            "mirror"
+        ] = st.session_state["gray_bw"] = 0
     elif key == "rotate_slider":
         st.session_state["rotate_slider"] = 0
     elif key == "checkboxes":
@@ -87,7 +88,7 @@ if upload_img is not None:
 
     # ---------- CROP ----------
     st.text("Crop image")
-    cropped_img = st_cropper(Image.fromarray(img_arr), should_resize_image=False)
+    cropped_img = st_cropper(Image.fromarray(img_arr), should_resize_image=True)
     st.text(
         f"Cropped width = {cropped_img.size[0]}px and height = {cropped_img.size[1]}px"
     )
@@ -102,6 +103,14 @@ if upload_img is not None:
             image = cropped_img
         else:
             image = Image.fromarray(img_arr)
+
+        # ---------- REMOVE BACKGROUND ----------
+        if lcol.checkbox(
+            label="Remove background?",
+            help="Select to remove background from the image",
+            key="bg",
+        ):
+            image = remove(image)
 
         # ---------- MIRROR ----------
         if lcol.checkbox(
