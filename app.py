@@ -3,8 +3,9 @@ import streamlit as st
 from PIL import Image, ImageEnhance, ImageOps
 from rembg import remove
 from streamlit_cropper import st_cropper
+from streamlit_drawable_canvas import st_canvas
 
-VERSION = "0.6.0"
+VERSION = "0.7.0"
 
 st.set_page_config(
     page_title="Image WorkDesk",
@@ -37,7 +38,7 @@ def _reset(key: str) -> None:
         ] = st.session_state["contrast_slider"] = 100
         st.session_state["bg"] = st.session_state["crop"] = st.session_state[
             "mirror"
-        ] = st.session_state["gray_bw"] = 0
+        ] = st.session_state["markup"] = st.session_state["gray_bw"] = 0
     elif key == "rotate_slider":
         st.session_state["rotate_slider"] = 0
     elif key == "checkboxes":
@@ -147,10 +148,51 @@ if upload_img is not None:
                 image = image.convert(mode).point(fn, mode="1")
         else:
             mode = "RGB"
+
+        # ---------- MARKUP ----------
+
+        if lcol.checkbox(
+            label="Add markup?",
+            help="Select to add markup to the image",
+            key="markup",
+        ):
+
+            # Specify canvas parameters in application
+            drawing_mode = lcol.selectbox(
+                "Drawing tool:",
+                ("freedraw", "line", "rect", "circle", "transform", "polygon", "point"),
+            )
+            stroke_width = lcol.slider("Stroke width: ", 1, 25, 3)
+            if drawing_mode == "point":
+                point_display_radius = lcol.slider("Point display radius: ", 1, 25, 3)
+            stroke_color = lcol.color_picker("Stroke color hex: ")
+
+            # Create a canvas component
+            canvas_result = st_canvas(
+                stroke_width=stroke_width,
+                stroke_color=stroke_color,
+                background_image=image,
+                update_streamlit=True,
+                drawing_mode=drawing_mode,
+                point_display_radius=point_display_radius
+                if drawing_mode == "point"
+                else 0,
+                display_toolbar=lcol.checkbox("Display toolbar", True),
+                key="full_app",
+            )
+
+            # Do something interesting with the image data and paths
+            if canvas_result.image_data is not None:
+                rcol.image(canvas_result.image_data)
+
+        # ---------- PREVIEW ----------
+
         rcol.image(
             image,
             use_column_width="auto",
         )
+
+        # ---------- RESET ----------
 
         if lcol.button(
             "Reset",

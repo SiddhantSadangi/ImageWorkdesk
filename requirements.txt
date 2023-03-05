@@ -3,3 +3,4 @@ Pillow
 rembg
 streamlit
 streamlit_cropper
+streamlit_drawable_canvas

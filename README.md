@@ -7,6 +7,7 @@ A lightweight image-processing Streamlit app that supports the following operati
 * Remove background
 * Mirror
 * Convert to grayscale or black and white
+* Add markdown
 * Rotate
 * Change brightness, saturation, contrast, sharpness
 * Generate random image from supplied image
