@@ -4,7 +4,7 @@ from PIL import Image, ImageEnhance, ImageOps
 from rembg import remove
 from streamlit_cropper import st_cropper
 
-VERSION = "0.6.0"
+VERSION = "0.6.1"
 
 st.set_page_config(
     page_title="Image WorkDesk",
@@ -15,7 +15,7 @@ st.set_page_config(
         "Report a Bug": "https://github.com/SiddhantSadangi/ImageWorkdesk/issues/new",
         "Get help": None,
     },
-    layout="centered",
+    layout="wide",
 )
 
 # ---------- SIDEBAR ----------
@@ -26,7 +26,7 @@ with st.sidebar:
     st.components.v1.html(sidebar_html, height=750)
 
 # ---------- HEADER ----------
-st.title("Welcome to Image WorkDesk!")
+st.title("🖼️ Welcome to Image WorkDesk!")
 
 # ---------- FUNCTIONS ----------
 def _reset(key: str) -> None:
@@ -60,7 +60,7 @@ def _randomize() -> None:
 # ---------- OPERATIONS ----------
 option = st.radio(
     label="Upload an image, or take one with your camera",
-    options=("Upload an image", "Take a photo with my camera"),
+    options=("Upload an image ⬆️", "Take a photo with my camera 📷"),
     help="Uploaded images are deleted from the server when you\n* upload another image\n* clear the file uploader\n* close the browser tab",
 )
 
@@ -87,7 +87,7 @@ if upload_img is not None:
     st.caption("All changes are applied on top of the previous change.")
 
     # ---------- CROP ----------
-    st.text("Crop image")
+    st.text("Crop image ✂️")
     cropped_img = st_cropper(Image.fromarray(img_arr), should_resize_image=True)
     st.text(
         f"Cropped width = {cropped_img.size[0]}px and height = {cropped_img.size[1]}px"
@@ -114,7 +114,7 @@ if upload_img is not None:
 
         # ---------- MIRROR ----------
         if lcol.checkbox(
-            label="Mirror image?",
+            label="Mirror image? 🪞",
             help="Select to mirror the image",
             key="mirror",
         ):
@@ -124,7 +124,7 @@ if upload_img is not None:
         flag = True
 
         if lcol.checkbox(
-            "Convert to grayscale / black & white?",
+            "Convert to grayscale / black & white? 🔲",
             key="gray_bw",
             help="Select to convert image to grayscale or black and white",
         ):
@@ -153,8 +153,9 @@ if upload_img is not None:
         )
 
         if lcol.button(
-            "Reset",
+            "↩️ Reset",
             on_click=_reset,
+            use_container_width=True,
             kwargs={"key": "checkboxes"},
         ):
             lcol.success("Image reset to original!")
@@ -164,13 +165,13 @@ if upload_img is not None:
     # ---------- OTHER OPERATIONS ----------
     # ---------- 1ST ROW ----------
     with st.container():
-        lcol, rcol = st.columns(2)
+        lcol, mcol, rcol = st.columns(3)
 
         # ---------- ROTATE ----------
         if "rotate_slider" not in st.session_state:
             st.session_state["rotate_slider"] = 0
         degrees = lcol.slider(
-            "Drag slider to rotate image clockwise",
+            "Drag slider to rotate image clockwise 🔁",
             min_value=0,
             max_value=360,
             value=st.session_state["rotate_slider"],
@@ -183,8 +184,9 @@ if upload_img is not None:
             caption=f"Rotated by {degrees} degrees clockwise",
         )
         if lcol.button(
-            "Reset Rotation",
+            "↩️ Reset Rotation",
             on_click=_reset,
+            use_container_width=True,
             kwargs={"key": "rotate_slider"},
         ):
             lcol.success("Rotation reset to original!")
@@ -193,8 +195,8 @@ if upload_img is not None:
             # ---------- BRIGHTNESS ----------
             if "brightness_slider" not in st.session_state:
                 st.session_state["brightness_slider"] = 100
-            brightness_factor = rcol.slider(
-                "Drag slider to change brightness",
+            brightness_factor = mcol.slider(
+                "Drag slider to change brightness 💡",
                 min_value=0,
                 max_value=200,
                 value=st.session_state["brightness_slider"],
@@ -203,54 +205,56 @@ if upload_img is not None:
             brightness_img = np.asarray(
                 ImageEnhance.Brightness(rotated_img).enhance(brightness_factor / 100)
             )
-            rcol.image(
+            mcol.image(
                 brightness_img,
                 use_column_width="auto",
                 caption=f"Brightness: {brightness_factor}%",
             )
-            if rcol.button(
-                "Reset Brightness",
+            if mcol.button(
+                "↩️ Reset Brightness",
                 on_click=_reset,
+                use_container_width=True,
                 kwargs={"key": "brightness_slider"},
             ):
-                rcol.success("Brightness reset to original!")
+                mcol.success("Brightness reset to original!")
+
+            # ---------- SATURATION ----------
+            if "saturation_slider" not in st.session_state:
+                st.session_state["saturation_slider"] = 100
+            saturation_factor = rcol.slider(
+                "Drag slider to change saturation",
+                min_value=0,
+                max_value=200,
+                value=st.session_state["saturation_slider"],
+                key="saturation_slider",
+            )
+            saturation_img = np.asarray(
+                ImageEnhance.Color(Image.fromarray(brightness_img)).enhance(
+                    saturation_factor / 100
+                )
+            )
+            rcol.image(
+                saturation_img,
+                use_column_width="auto",
+                caption=f"Saturation: {saturation_factor}%",
+            )
+            if rcol.button(
+                "↩️ Reset Saturation",
+                on_click=_reset,
+                use_container_width=True,
+                kwargs={"key": "saturation_slider"},
+            ):
+                rcol.success("Saturation reset to original!")
 
             st.markdown("""---""")
 
             # ---------- 2ND ROW ----------
             with st.container():
-                lcol, rcol = st.columns(2)
-                # ---------- SATURATION ----------
-                if "saturation_slider" not in st.session_state:
-                    st.session_state["saturation_slider"] = 100
-                saturation_factor = lcol.slider(
-                    "Drag slider to change saturation",
-                    min_value=0,
-                    max_value=200,
-                    value=st.session_state["saturation_slider"],
-                    key="saturation_slider",
-                )
-                saturation_img = np.asarray(
-                    ImageEnhance.Color(Image.fromarray(brightness_img)).enhance(
-                        saturation_factor / 100
-                    )
-                )
-                lcol.image(
-                    saturation_img,
-                    use_column_width="auto",
-                    caption=f"Saturation: {saturation_factor}%",
-                )
-                if lcol.button(
-                    "Reset Saturation",
-                    on_click=_reset,
-                    kwargs={"key": "saturation_slider"},
-                ):
-                    lcol.success("Saturation reset to original!")
-
+                lcol, mcol, rcol = st.columns(3)
                 # ---------- CONTRAST ----------
                 if "contrast_slider" not in st.session_state:
                     st.session_state["contrast_slider"] = 100
-                contrast_factor = rcol.slider(
+                contrast_factor = lcol.slider(
                     "Drag slider to change contrast",
                     min_value=0,
                     max_value=200,
@@ -262,25 +266,23 @@ if upload_img is not None:
                         contrast_factor / 100
                     )
                 )
-                rcol.image(
+                lcol.image(
                     contrast_img,
                     use_column_width="auto",
                     caption=f"Contrast: {contrast_factor}%",
                 )
-                if rcol.button(
-                    "Reset Contrast", on_click=_reset, kwargs={"key": "contrast_slider"}
+                if lcol.button(
+                    "↩️ Reset Contrast",
+                    on_click=_reset,
+                    use_container_width=True,
+                    kwargs={"key": "contrast_slider"},
                 ):
-                    rcol.success("Contrast reset to original!")
+                    lcol.success("Contrast reset to original!")
 
-                st.markdown("""---""")
-
-            # ---------- 3RD ROW ----------
-            with st.container():
-                lcol, rcol = st.columns(2)
                 # ---------- SHARPNESS ----------
                 if "sharpness_slider" not in st.session_state:
                     st.session_state["sharpness_slider"] = 100
-                sharpness_factor = lcol.slider(
+                sharpness_factor = mcol.slider(
                     "Drag slider to change sharpness",
                     min_value=0,
                     max_value=200,
@@ -292,17 +294,18 @@ if upload_img is not None:
                         sharpness_factor / 100
                     )
                 )
-                lcol.image(
+                mcol.image(
                     sharpness_img,
                     use_column_width="auto",
                     caption=f"Sharpness: {sharpness_factor}%",
                 )
-                if lcol.button(
-                    "Reset Sharpness",
+                if mcol.button(
+                    "↩️ Reset Sharpness",
                     on_click=_reset,
+                    use_container_width=True,
                     kwargs={"key": "sharpness_slider"},
                 ):
-                    lcol.success("Sharpness reset to original!")
+                    mcol.success("Sharpness reset to original!")
 
     st.markdown("""---""")
 
@@ -323,14 +326,31 @@ if upload_img is not None:
     rcol.image(
         final_image,
         use_column_width="auto",
-        caption=f"Final Image ({final_image.shape[1]} x {final_image.shape[0]})",
+        caption=f"Final Image ({final_image.shape[1]} x {final_image.shape[0]})"
+        if flag
+        else f"Final Image ({final_image.size[1]} x {final_image.size[0]})",
     )
-    Image.fromarray(final_image).save("final_image.png")
+
+    if flag:
+        Image.fromarray(final_image).save("final_image.png")
+    else:
+        final_image.save("final_image.png")
 
     col1, col2, col3 = st.columns(3)
-    if col1.button("Reset All", on_click=_reset, kwargs={"key": "all"}):
-        st.success("Image reset to original!")
-    if col2.button("Surprise Me!", on_click=_randomize):
-        st.success("Random image generated")
+    if col1.button(
+        "↩️ Reset All", on_click=_reset, use_container_width=True, kwargs={"key": "all"}
+    ):
+        st.success(body="Image reset to original!", icon="↩️")
+    if col2.button(
+        "🔀 Surprise Me!",
+        on_click=_randomize,
+        use_container_width=True,
+    ):
+        st.success(body="Random image generated", icon="🔀")
     with open("final_image.png", "rb") as file:
-        col3.download_button("Download Result", data=file, mime="image/png")
+        col3.download_button(
+            "💾Download final image",
+            data=file,
+            mime="image/png",
+            use_container_width=True,
+        )
