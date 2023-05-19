@@ -2,7 +2,7 @@
 
 A lightweight image-processing Streamlit app that supports the following operations:
 
-* Upload image or take one with your camera
+* Upload image, take one with your camera, or load from a URL
 * Crop
 * Remove background
 * Mirror
