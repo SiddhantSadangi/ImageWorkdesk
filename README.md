@@ -10,6 +10,7 @@ A lightweight image-processing Streamlit app that supports the following operati
 * Rotate
 * Change brightness, saturation, contrast, sharpness
 * Generate random image from supplied image
+* Compare original and final images
 * Download results
 
 [![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://share.streamlit.io/siddhantsadangi/imageworkdesk/app.py)

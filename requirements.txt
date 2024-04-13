@@ -1,5 +1,7 @@
 numpy
 Pillow
 rembg
+st_social_media_links
 streamlit
+streamlit-image-comparison
 streamlit_cropper

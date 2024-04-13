@@ -1,0 +1,6 @@
+[theme]
+base="dark"
+
+[server]
+enableXsrfProtection = false
+enableCORS = false
