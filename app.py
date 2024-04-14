@@ -460,3 +460,8 @@ with contextlib.suppress(NameError):
                 mime="image/png",
                 use_container_width=True,
             )
+
+st.success(
+    "[Star the repo](https://github.com/SiddhantSadangi/imageworkdesk) to show your :heart:",
+    icon="⭐",
+)
