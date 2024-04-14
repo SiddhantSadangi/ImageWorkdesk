@@ -10,7 +10,7 @@ from st_social_media_links import SocialMediaIcons
 from streamlit_cropper import st_cropper
 from streamlit_image_comparison import image_comparison
 
-VERSION = "1.0.0"
+VERSION = "1.0.1"
 
 
 # ---------- UTILS ----------
@@ -83,7 +83,7 @@ with st.sidebar:
     st.html(
         """
         <div style="text-align:center; font-size:14px; color:lightgrey">
-            <hr>
+            <hr style="margin-bottom: 6%; margin-top: 0%;">
             Share the ❤️ on social media
         </div>"""
     )
@@ -103,7 +103,7 @@ with st.sidebar:
     st.html(
         """
         <div style="text-align:center; font-size:12px; color:lightgrey">
-            <hr>
+            <hr style="margin-bottom: 6%; margin-top: 6%;">
             <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
                 <img alt="Creative Commons License" style="border-width:0"
                     src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" />
