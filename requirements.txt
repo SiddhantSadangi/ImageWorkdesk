@@ -1,6 +1,7 @@
+numba
 numpy
 Pillow
-rembg
+rembg[cpu]
 st_social_media_links
 streamlit-image-comparison
 streamlit_cropper

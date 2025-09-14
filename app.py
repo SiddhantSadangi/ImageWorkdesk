@@ -10,7 +10,7 @@ from st_social_media_links import SocialMediaIcons
 from streamlit_cropper import st_cropper
 from streamlit_image_comparison import image_comparison
 
-VERSION = "1.0.1"
+VERSION = "1.0.2"
 
 
 # ---------- UTILS ----------
@@ -61,7 +61,7 @@ st.title("🖼️ Welcome to Image WorkDesk!")
 
 # ---------- SIDEBAR ----------
 with st.sidebar:
-    with st.expander("✅ Supported operations"):
+    with st.expander("Supported operations"):
         st.info(
             "* Upload image, take one with your camera, or load from a URL\n"
             "* Crop\n"
@@ -78,7 +78,7 @@ with st.sidebar:
     with open("sidebar.html", "r", encoding="UTF-8") as sidebar_file:
         sidebar_html = sidebar_file.read().replace("{VERSION}", VERSION)
 
-    st.components.v1.html(sidebar_html, height=225)
+    st.components.v1.html(sidebar_html, height=290)
 
     st.html(
         """
