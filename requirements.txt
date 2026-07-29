@@ -3,5 +3,6 @@ numpy
 Pillow
 rembg[cpu]
 st_social_media_links
+streamlit>=1.53.0
 streamlit-image-comparison
 streamlit_cropper

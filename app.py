@@ -1,8 +1,6 @@
 import contextlib
-from io import BytesIO
 
 import numpy as np
-import requests
 import streamlit as st
 from PIL import Image, ImageEnhance, ImageOps
 from rembg import remove
@@ -10,7 +8,9 @@ from st_social_media_links import SocialMediaIcons
 from streamlit_cropper import st_cropper
 from streamlit_image_comparison import image_comparison
 
-VERSION = "1.0.2"
+from remote_image import ImageFetchError, fetch_image_from_url
+
+VERSION = "1.0.3"
 
 
 # ---------- UTILS ----------
@@ -146,15 +146,35 @@ elif option == "Load image from a URL 🌐":
     url = st.text_input(
         "Image URL",
         key="url",
+        max_chars=2048,
+        help="Only public HTTP(S) URLs for supported raster images are allowed.",
     )
     mode = "url"
+    upload_img = None
 
-    if url != "":
+    cached_url = st.session_state.get("remote_image_url")
+    if cached_url != url:
+        st.session_state.pop("remote_image_value", None)
+        st.session_state.pop("remote_image_url", None)
+
+    if st.button(
+        "Load image",
+        key="load_remote_image",
+        type="primary",
+        disabled=not url,
+    ):
         try:
-            response = requests.get(url)
-            upload_img = Image.open(BytesIO(response.content))
-        except:
-            st.error("The URL does not seem to be valid.")
+            downloaded_image = fetch_image_from_url(url)
+        except ImageFetchError:
+            st.session_state.pop("remote_image_value", None)
+            st.session_state.pop("remote_image_url", None)
+            st.error("The URL could not be loaded as a safe, supported image.")
+        else:
+            st.session_state["remote_image_value"] = downloaded_image
+            st.session_state["remote_image_url"] = url
+
+    if st.session_state.get("remote_image_url") == url:
+        upload_img = st.session_state.get("remote_image_value")
 
 with contextlib.suppress(NameError):
     if upload_img is not None:
